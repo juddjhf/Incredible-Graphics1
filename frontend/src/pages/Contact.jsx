@@ -3,12 +3,12 @@ import { useState } from "react";
 import {
   Mail,
   MapPin,
-  Send,
   CheckCircle2,
   LoaderCircle,
   Palette,
 } from "lucide-react";
 import api from "../services/api";
+import Button from "../components/Button";
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -58,7 +58,7 @@ function Contact() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "Message send nahi hua. Please try again."
+          "Your message could not be sent. Please try again."
       );
     } finally {
       setLoading(false);
@@ -328,24 +328,16 @@ function Contact() {
                 </p>
               )}
 
-              <button
+              <Button
                 type="submit"
-                disabled={loading}
-                aria-busy={loading}
-                className="button-primary flex w-full items-center justify-center gap-3 rounded-xl px-6 py-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                loading={loading}
+                variant="primary"
+                showArrow={!loading}
+                icon={loading ? <LoaderCircle size={18} className="animate-spin" /> : undefined}
+                className="contact-submit"
               >
-                {loading ? (
-                  <>
-                    <LoaderCircle size={20} className="animate-spin" />
-                    Sending Message...
-                  </>
-                ) : (
-                  <>
-                    <Send size={20} />
-                    Send Message
-                  </>
-                )}
-              </button>
+                {loading ? "Sending Message..." : "Send Message"}
+              </Button>
             </form>
           </section>
         </div>

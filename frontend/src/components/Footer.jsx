@@ -1,15 +1,17 @@
 import { Link } from "react-router-dom";
 import {
-  ArrowUpRight,
   Mail,
   ArrowUp,
+  Camera,
+  BriefcaseBusiness,
 } from "lucide-react";
+import Button from "./Button";
 
 const footerLinks = [
   { name: "Home", path: "/" },
-  { name: "Projects", path: "/projects" },
+  { name: "Portfolio", path: "/projects" },
   { name: "Services", path: "/services" },
-  { name: "Reels", path: "/reels" },
+  { name: "About", path: "/#about" },
   { name: "Contact", path: "/contact" },
 ];
 
@@ -22,23 +24,19 @@ function Footer() {
         <div className="site-footer-grid">
           <div className="site-footer-brand">
             <Link to="/" className="site-brand">
-              <img
-                src="/incredible-logo.png"
-                alt="Incredible Graphics logo"
-                className="site-brand-mark"
-              />
+              <span className="site-brand-mark" aria-hidden="true">IG</span>
               <span className="site-brand-name">Incredible <b>Graphics</b></span>
             </Link>
             <p className="site-footer-copy">
               Creative identities, impactful graphics and scroll-stopping
               visuals that help brands stand out.
             </p>
-            <Link to="/contact" className="site-footer-talk">
-              Let&apos;s work together <ArrowUpRight size={17} />
-            </Link>
+            <Button to="/contact" variant="text" className="site-footer-talk">
+              Let&apos;s work together
+            </Button>
           </div>
 
-          <div className="site-footer-column">
+          <div className="site-footer-column footer-explore">
             <h3>Explore</h3>
             <ul>
               {footerLinks.map((link) => (
@@ -46,19 +44,17 @@ function Footer() {
                   <Link to={link.path}>{link.name}</Link>
                 </li>
               ))}
-              <li><Link to="/order">Start a project</Link></li>
             </ul>
           </div>
 
-          <div className="site-footer-column">
-            <h3>Start something</h3>
+          <div className="site-footer-column footer-contact">
+            <h3>Get in touch</h3>
             <p className="site-footer-copy">
-              Have a design project in mind? Tell us what you&apos;re imagining.
+              Have a project in mind? Send us a note through the inquiry form.
             </p>
-            <Link to="/contact" className="site-footer-contact">
-              <Mail size={17} />
-              Let&apos;s talk about it
-            </Link>
+            <Button to="/contact" variant="text" className="site-footer-contact" showArrow={false} icon={<Mail size={17} />}>
+              Send an enquiry
+            </Button>
             <div className="site-footer-socials">
               <a
                 href="https://www.instagram.com/"
@@ -66,7 +62,7 @@ function Footer() {
                 rel="noreferrer"
                 aria-label="Instagram"
               >
-                IG
+                <Camera size={16} />
               </a>
               <a
                 href="https://www.linkedin.com/"
@@ -74,7 +70,7 @@ function Footer() {
                 rel="noreferrer"
                 aria-label="LinkedIn"
               >
-                in
+                <BriefcaseBusiness size={16} />
               </a>
             </div>
           </div>
@@ -82,9 +78,10 @@ function Footer() {
 
         <div className="site-footer-bottom">
           <p>© {currentYear} Incredible Graphics. All rights reserved.</p>
-          <Link to="/" className="site-footer-top">
-            Back to top <ArrowUp size={15} />
-          </Link>
+          <div className="site-footer-bottom-links">
+            <Link to="/contact">Contact</Link>
+            <a href="#top" className="site-footer-top">Back to top <ArrowUp size={15} /></a>
+          </div>
         </div>
       </div>
     </footer>

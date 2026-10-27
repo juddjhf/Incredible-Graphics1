@@ -3,17 +3,40 @@ import { useEffect, useState } from "react";
 import { Palette, Search } from "lucide-react";
 import api from "../services/api";
 import ProjectCard from "../components/ProjectCard";
+import Button from "../components/Button";
 
 const categories = [
   "All",
-  "Logo Design",
   "Branding",
-  "Social Media Design",
-  "YouTube Thumbnail",
-  "Poster Design",
-  "UI/UX Design",
+  "Logos",
+  "Social Media",
+  "Posters",
+  "Packaging",
   "Other",
 ];
+
+const categoryTerms = {
+  Branding: ["brand"],
+  Logos: ["logo"],
+  "Social Media": ["social media", "social", "instagram"],
+  Posters: ["poster"],
+  Packaging: ["packaging", "package"],
+  Other: ["other", "custom"],
+};
+
+function matchesCategory(project, category) {
+  if (category === "All") return true;
+
+  const projectTerms = [
+    project.category,
+    ...(Array.isArray(project.tags) ? project.tags : []),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return categoryTerms[category].some((term) => projectTerms.includes(term));
+}
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -43,7 +66,7 @@ const Projects = () => {
       } catch (err) {
         setError(
           err.response?.data?.message ||
-            "Projects load nahi ho paaye. Backend check karo."
+            "Projects could not be loaded. Please check the connection and try again."
         );
       } finally {
         setLoading(false);
@@ -54,69 +77,77 @@ const Projects = () => {
   }, []);
 
   const filteredProjects = projects.filter((project) => {
-    const matchesCategory =
-      selectedCategory === "All" ||
-      project.category === selectedCategory;
-
     const searchText = search.toLowerCase().trim();
+    const searchableText = [
+      project.title,
+      project.category,
+      project.description,
+      ...(Array.isArray(project.tags) ? project.tags : []),
+    ]
+      .filter((value) => typeof value === "string")
+      .join(" ")
+      .toLowerCase();
 
-    const matchesSearch =
-      project.title?.toLowerCase().includes(searchText) ||
-      project.description?.toLowerCase().includes(searchText) ||
-      project.tags?.some((tag) =>
-        tag.toLowerCase().includes(searchText)
-      );
+    const matchesSearch = searchableText.includes(searchText);
 
-    return matchesCategory && matchesSearch;
+    return matchesCategory(project, selectedCategory) && matchesSearch;
   });
 
   return (
     <main className="editorial-page projects-page min-h-screen bg-[#09090b] px-5 pb-20 pt-28 text-white sm:px-8">
       <section className="mx-auto max-w-7xl">
-        <div className="mb-12 text-center">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-fuchsia-400/20 bg-fuchsia-400/10 px-4 py-2 text-sm text-fuchsia-300">
-            <Palette size={16} />
-            Creative Portfolio
+        <div className="portfolio-hero">
+          <div className="portfolio-heading">
+            <div className="portfolio-eyebrow">
+              <Palette size={15} aria-hidden="true" />
+              Selected work
+            </div>
+
+            <h1>
+              A few things we&apos;ve <span>made.</span>
+            </h1>
+
+            <p>
+              A selection of identities, campaigns and visual ideas made to
+              leave a lasting impression.
+            </p>
           </div>
-
-          <h1 className="text-4xl font-black tracking-tight sm:text-6xl">
-            Selected{" "}
-            <span className="text-fuchsia-400">Projects.</span>
-          </h1>
-
-          <p className="mx-auto mt-5 max-w-2xl leading-7 text-gray-400">
-            Explore graphic designs, brand identities, social media
-            creatives and other visual projects.
-          </p>
+          <div className="portfolio-hero-art" aria-hidden="true">
+            <span className="portfolio-hero-art-orbit" />
+            <span className="portfolio-hero-art-frame">
+              <span>IG / SELECTED WORK</span>
+              <strong>Ideas<br />in focus.</strong>
+              <span>BRAND · IMAGE · IMPACT</span>
+            </span>
+          </div>
         </div>
 
-        <div className="mx-auto mb-8 flex max-w-xl items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
-          <Search size={19} className="shrink-0 text-gray-400" />
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search projects or tags..."
-            aria-label="Search projects"
-            className="w-full bg-transparent text-sm outline-none placeholder:text-gray-500"
-          />
-        </div>
-
-        <div className="mb-10 flex flex-wrap justify-center gap-3">
-          {categories.map((category) => (
-            <button
-              key={category}
-              type="button"
-              onClick={() => setSelectedCategory(category)}
-              className={`rounded-full border px-4 py-2 text-sm transition ${
-                selectedCategory === category
-                  ? "border-fuchsia-400 bg-fuchsia-500 text-white"
-                  : "border-white/10 bg-white/[0.03] text-gray-300 hover:border-fuchsia-400/50"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
+        <div className="portfolio-toolbar">
+          <div className="portfolio-filters" aria-label="Filter projects by category">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                type="button"
+                variant="filter"
+                showArrow={false}
+                onClick={() => setSelectedCategory(category)}
+                aria-pressed={selectedCategory === category}
+                className={selectedCategory === category ? "is-selected" : ""}
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+          <label className="portfolio-search">
+            <Search size={18} aria-hidden="true" />
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search projects, categories or tags"
+              aria-label="Search projects, categories or tags"
+            />
+          </label>
         </div>
 
         {loading ? (
@@ -133,29 +164,51 @@ const Projects = () => {
             {error}
           </p>
         ) : filteredProjects.length === 0 ? (
-          <div className="rounded-2xl border border-white/10 p-10 text-center">
-            <Palette className="mx-auto mb-4 text-gray-500" size={32} />
-            <h2 className="text-xl font-bold">No projects found</h2>
-            <p className="mt-2 text-gray-400">
-              Search change karo ya doosri category select karo.
-            </p>
+          <div className="portfolio-empty-state">
+            <Palette className="mx-auto mb-4 text-gray-500" size={30} aria-hidden="true" />
+            <h2>No projects found</h2>
+            <p>Try a different search or category to explore the work.</p>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setSearch("");
+                setSelectedCategory("All");
+              }}
+            >
+              Clear filters
+            </Button>
           </div>
         ) : (
           <>
-            <p className="mb-5 text-sm text-gray-400">
-              {filteredProjects.length} project(s) found
+            <p className="portfolio-result-count" role="status" aria-live="polite">
+              Showing <strong>{filteredProjects.length}</strong>{" "}
+              {filteredProjects.length === 1 ? "project" : "projects"}
             </p>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredProjects.map((project) => (
+            <div className="portfolio-grid">
+              {filteredProjects.map((project, index) => (
                 <ProjectCard
                   key={project._id}
                   project={project}
+                  featured={index === 0}
                 />
               ))}
             </div>
           </>
         )}
+
+        <section className="portfolio-cta" aria-labelledby="portfolio-cta-title">
+          <div>
+            <p>Have an idea taking shape?</p>
+            <h2 id="portfolio-cta-title">
+              Have a project in mind? <span>Let&apos;s make it stand out.</span>
+            </h2>
+          </div>
+          <Button to="/contact" variant="primary">
+            Start a Project
+          </Button>
+        </section>
       </section>
     </main>
   );

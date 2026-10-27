@@ -1,32 +1,36 @@
 
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
+import Button from "./Button";
 
 const navLinks = [
   { name: "Home", path: "/" },
-  { name: "Projects", path: "/projects" },
+  { name: "Portfolio", path: "/projects" },
   { name: "Services", path: "/services" },
-  { name: "Reels", path: "/reels" },
+  { name: "About", path: "/#about" },
   { name: "Contact", path: "/contact" },
 ];
 
 function Navbar() {
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const getNavClass = (isActive, path, mobile = false) => {
+    const active = isActive && (path !== "/#about" || location.hash === "#about");
+    return mobile
+      ? `mobile-nav-link${active ? " active" : ""}`
+      : `site-nav-link${active ? " active" : ""}`;
+  };
 
   return (
-    <header className="site-header">
+    <header className="site-header" id="top">
       <nav className="site-nav">
         <Link
           to="/"
           onClick={() => setMenuOpen(false)}
           className="site-brand"
         >
-          <img
-            src="/incredible-logo.png"
-            alt="Incredible Graphics logo"
-            className="site-brand-mark"
-          />
+          <span className="site-brand-mark" aria-hidden="true">IG</span>
           <span className="site-brand-name">Incredible <b>Graphics</b></span>
         </Link>
 
@@ -36,22 +40,16 @@ function Navbar() {
               key={link.path}
               to={link.path}
               end={link.path === "/"}
-              className={({ isActive }) =>
-                `site-nav-link${isActive ? " active" : ""}`
-              }
+              className={({ isActive }) => getNavClass(isActive, link.path)}
             >
               {link.name}
             </NavLink>
           ))}
         </div>
 
-        <Link
-          to="/order"
-          className="site-nav-cta"
-        >
+        <Button to="/contact" className="site-nav-cta" variant="primary">
           Start a Project
-          <ArrowUpRight size={16} />
-        </Link>
+        </Button>
 
         <button
           type="button"
@@ -74,20 +72,20 @@ function Navbar() {
                 to={link.path}
                 end={link.path === "/"}
                 onClick={() => setMenuOpen(false)}
-                className={({ isActive }) => `mobile-nav-link${isActive ? " active" : ""}`}
+                className={({ isActive }) => getNavClass(isActive, link.path, true)}
               >
                 {link.name}
               </NavLink>
             ))}
 
-            <Link
-              to="/order"
+            <Button
+              to="/contact"
               onClick={() => setMenuOpen(false)}
               className="mobile-nav-cta"
+              variant="primary"
             >
               Start a Project
-              <ArrowUpRight size={17} />
-            </Link>
+            </Button>
           </div>
         </div>
       )}

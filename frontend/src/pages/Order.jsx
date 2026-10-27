@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Send, ClipboardList, LoaderCircle } from "lucide-react";
 import api from "../services/api";
+import Button from "../components/Button";
 
 const initialForm = {
   clientName: "",
@@ -297,22 +298,17 @@ const Order = () => {
             </p>
           )}
 
-          <button
+          <Button
             type="submit"
-            disabled={submitting || loadingServices || services.length === 0}
-            aria-busy={submitting}
-            className="button-primary flex w-full items-center justify-center gap-2 rounded-xl px-5 py-4 font-bold disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={loadingServices || services.length === 0}
+            loading={submitting}
+            variant="primary"
+            showArrow={false}
+            icon={submitting ? <LoaderCircle size={18} className="animate-spin" /> : <Send size={17} />}
+            className="order-submit"
           >
-            {submitting ? (
-              <>
-                <LoaderCircle size={18} className="animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              "Submit Project Request"
-            )}
-            {!submitting && <Send size={18} />}
-          </button>
+            {submitting ? "Submitting..." : "Submit Project Request"}
+          </Button>
 
           <p className="text-center text-xs leading-5 text-gray-500">
             This is a project inquiry, not an online payment. Pricing and

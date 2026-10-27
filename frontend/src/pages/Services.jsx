@@ -1,8 +1,8 @@
 
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Clock, Palette, CheckCircle2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Clock, Palette, CheckCircle2 } from "lucide-react";
 import api from "../services/api";
+import Button from "../components/Button";
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -23,7 +23,7 @@ const Services = () => {
       } catch (err) {
         setError(
           err.response?.data?.message ||
-            "Services load nahi ho paayi. Backend check karo."
+            "Services could not be loaded. Please check the connection and try again."
         );
       } finally {
         setLoading(false);
@@ -135,13 +135,13 @@ const Services = () => {
                   </ul>
                 )}
 
-                <Link
+                <Button
                   to={`/order?service=${encodeURIComponent(service._id)}`}
-                  className="button button-primary mt-auto flex items-center justify-center gap-2 normal-case tracking-normal"
+                  variant="primary"
+                  className="service-order-button"
                 >
                   Order This Service
-                  <ArrowUpRight size={18} />
-                </Link>
+                </Button>
               </article>
             ))}
           </div>
