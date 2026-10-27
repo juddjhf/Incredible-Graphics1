@@ -1,23 +1,16 @@
 
 const mongoose = require("mongoose");
 
-
-
 const connectDB = async () => {
-  try {
-    const mongoURI = process.env.MONGO_URI;
+  const mongoURI = process.env.MONGO_URI;
 
-    if (!mongoURI) {
-      throw new Error("MONGO_URI is missing");
-    }
-
-    await mongoose.connect(mongoURI);
-
-    console.log("MongoDB Atlas Connected Successfully");
-  } catch (error) {
-    console.error("MongoDB Connection Error:", error.message);
-    process.exit(1);
+  if (!mongoURI) {
+    throw new Error("MONGO_URI is missing in environment variables");
   }
+
+  await mongoose.connect(mongoURI);
+
+  console.log("MongoDB Atlas Connected Successfully");
 };
 
-module.exports= connectDB;
+module.exports = connectDB;
